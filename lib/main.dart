@@ -420,18 +420,20 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ta_c14210052/constant/api_url.dart';
 import 'package:ta_c14210052/views/pages/app/home_screen.dart';
-import 'package:ta_c14210052/views/pages/app/notification_screen.dart';
+import 'package:ta_c14210052/views/pages/app/notification_page.dart';
 import 'package:ta_c14210052/views/pages/app/profile_page.dart';
 import 'package:ta_c14210052/views/pages/app/transaction_list_page.dart';
 import 'package:ta_c14210052/views/pages/auth/login_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('id_ID', null); // Inisialisasi lokal bahasa Indonesia
+  await initializeDateFormatting(
+      'id_ID', null); // Inisialisasi lokal bahasa Indonesia
   runApp(const MyApp());
 }
 
@@ -480,7 +482,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const TransactionListPage(),
-    const NotificationScreen(),
+    NotificationPage(),
     const ProfilePage(),
   ];
 
@@ -537,8 +539,10 @@ class _MainScreenState extends State<MainScreen> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: "Transactions"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notification"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag), label: "Transactions"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: "Notification"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
