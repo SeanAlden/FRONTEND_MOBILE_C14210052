@@ -152,18 +152,18 @@
 // }
 
 class Cart {
-  final int id;
-  final int userId;
-  final int productId;
-  final String productName;
-  final String productImage;
-  final double productPrice;
-  int quantity;
-  double grossAmount;
-  final DateTime? expiredDate;
-  int stock;
-  final String? shippingMethod;
-  final String paymentMethod;
+  final int id; // id cart
+  final int userId; // id user
+  final int productId; // id produk
+  final String productName; // nama produk
+  final String productImage; // gambar produk
+  final double productPrice; // harga produk
+  int quantity; // jumlah kuantitas produk
+  double grossAmount; // total harga produk
+  final DateTime? expiredDate; // tanggal kadaluarsa produk
+  int stock; // jumlah stok pada tanggal exp produk terkait
+  final String? shippingMethod; // metode pengiriman 
+  final String paymentMethod; // metode pembayaran
 
   Cart({
     required this.id,
@@ -180,26 +180,54 @@ class Cart {
     required this.paymentMethod,
   });
 
+  // mengambil data dengan API call
   factory Cart.fromJson(Map<String, dynamic> json) {
     return Cart(
-      id: json['id'],
-      userId: json['user_id'],
-      productId: json['product_id'],
-      productName: json['product_name'],
-      productImage: json['product_image'],
-      productPrice: double.tryParse(json['product_price'].toString()) ?? 0.0,
-      quantity: json['quantity'],
-      grossAmount: double.tryParse(json['gross_amount'].toString()) ?? 0.0,
-      expiredDate: json['expired_date'] != null
-          ? DateTime.tryParse(json['expired_date'])
-          : null,
-      stock: json['stock'] ?? 0,
-      shippingMethod: json['shipping_method'],
-      paymentMethod: json['payment_method'] ?? 'Cash',
-      // stockByDates: (json['stock_by_dates'] as List).map((s) => StockByDate.fromJson(s)).toList(),
+      // id: json['id'],
+      // userId: json['user_id'],
+      // productId: json['product_id'],
+      // productName: json['product_name'],
+      // productImage: json['product_image'],
+      // productPrice: double.tryParse(json['product_price'].toString()) ?? 0.0,
+      // quantity: json['quantity'],
+      // grossAmount: double.tryParse(json['gross_amount'].toString()) ?? 0.0,
+      // expiredDate: json['expired_date'] != null
+      //     ? DateTime.tryParse(json['expired_date'])
+      //     : null,
+      // stock: json['stock'] ?? 0,
+      // shippingMethod: json['shipping_method'],
+      // paymentMethod: json['payment_method'] ?? 'Cash',
+      // // stockByDates: (json['stock_by_dates'] as List).map((s) => StockByDate.fromJson(s)).toList(),
 
+      id: parseInt(json['id']), 
+      userId: parseInt(json['user_id']), 
+      productId: parseInt(json['product_id']), 
+      productName: json['product_name'] ?? '', 
+      productImage: json['product_image'] ?? '', 
+      productPrice: parseDouble(json['product_price']),
+      quantity: parseInt(json['quantity']),  
+      grossAmount: parseDouble(json['gross_amount']), 
+      expiredDate: json['expired_date'] != null 
+        ? DateTime.tryParse(json['expired_date'])
+        : null,
+      stock: parseInt(json['stock']), 
+      shippingMethod: json['shipping_method'], 
+      paymentMethod: json['payment_method'] ?? 'Cash', 
     );
   }
 }
 
+// parsing data ke integer
+int parseInt(dynamic value) {
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
 
+// parsing data ke double
+double parseDouble(dynamic value) {
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0.0;
+  return 0.0;
+}

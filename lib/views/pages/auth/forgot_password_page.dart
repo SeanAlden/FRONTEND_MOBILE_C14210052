@@ -10,7 +10,6 @@ class ForgotPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text("Forgot Password?")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -56,6 +55,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   //       style: TextStyle(color: Colors.white)),
                   // ),
 
+                // untuk meminta kode verifikasi
                   ElevatedButton(
                 onPressed: () async {
                   final email = _emailController.text.trim();

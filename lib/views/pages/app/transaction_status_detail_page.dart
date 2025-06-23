@@ -64,7 +64,8 @@ class _TransactionStatusDetailPageState
           'Authorization': 'Bearer $token',
         },
       );
-
+ 
+      if (!mounted) return;
       if (response.statusCode == 200) {
         setState(() {
           statusHistories = json.decode(response.body);
@@ -293,17 +294,12 @@ class _TransactionStatusDetailPageState
             beforeLineStyle: LineStyle(
               color: index == statusHistories.length - 1
                   ? Colors.transparent
-                  : Colors.blueAccent, 
-              thickness: index == statusHistories.length - 1
-                  ? 0
-                  : 3, 
+                  : Colors.blueAccent,
+              thickness: index == statusHistories.length - 1 ? 0 : 3,
             ),
             afterLineStyle: LineStyle(
-              color: index == 0
-                  ? Colors.transparent
-                  : Colors.blueAccent, 
-              thickness:
-                  index == 0 ? 0 : 3, 
+              color: index == 0 ? Colors.transparent : Colors.blueAccent,
+              thickness: index == 0 ? 0 : 3,
             ),
             // endChild: Container(
             //   margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -626,6 +622,24 @@ class _TransactionStatusDetailPageState
     return lastStatus == 'Pesanan selesai';
   }
 
+  // bool get isLastStatusPembatalanBerhasil {
+  //   if (statusHistories.isEmpty) return false;
+  //   final lastStatus = statusHistories.last['status'];
+  //   return lastStatus == 'Pembatalan berhasil';
+  // }
+
+  // bool get isLastStatusPengirimanGagal {
+  //   if (statusHistories.isEmpty) return false;
+  //   final lastStatus = statusHistories.last['status'];
+  //   return lastStatus == 'Pengiriman gagal';
+  // }
+
+  // bool get isFinalSaveEnabled {
+  //   return isLastStatusPesananSelesai ||
+  //       isLastStatusPembatalanBerhasil ||
+  //       isLastStatusPengirimanGagal;
+  // }
+
   String formatUtcToWib(String utcString) {
     // parsing dari String ke DateTime UTC
     final utcDate = DateTime.parse(utcString).toUtc();
@@ -679,7 +693,7 @@ class _TransactionStatusDetailPageState
                       // Visibility(
                       //   visible:
                       //   // transaction
-                      //   //     .isFinal, 
+                      //   //     .isFinal,
                       //   transaction?.isFinal ?? false,
                       //   child: Row(
                       //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -742,7 +756,7 @@ class _TransactionStatusDetailPageState
 
                       isTransactionFinal
                           ? const SizedBox() // Tombol tidak ditampilkan jika sudah final
-                            : Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton.icon(
@@ -772,6 +786,19 @@ class _TransactionStatusDetailPageState
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
+                                // ElevatedButton(
+                                //   onPressed:
+                                //       isFinalSaveEnabled ? _finalSave : null,
+                                //   style: ElevatedButton.styleFrom(
+                                //     backgroundColor: isFinalSaveEnabled
+                                //         ? Colors.blue
+                                //         : Colors.grey[700],
+                                //   ),
+                                //   child: const Text(
+                                //     'Final Save',
+                                //     style: TextStyle(color: Colors.white),
+                                //   ),
+                                // ),
                               ],
                             ),
 
@@ -1261,7 +1288,7 @@ class _TransactionStatusDetailPageState
   }
 
   void _addStatus() async {
-    Navigator.pop(context); 
+    Navigator.pop(context);
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -1304,7 +1331,7 @@ class _TransactionStatusDetailPageState
     if (response.statusCode == 200) {
       setState(() {
         isFinalSaved = true;
-        isTransactionFinal = true; 
+        isTransactionFinal = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Final save berhasil!')),

@@ -132,7 +132,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProductCard extends StatefulWidget {
-  final Product product;
+  final Product product; // mengambil data produk dari model produk
 
   const ProductCard({super.key, required this.product});
 
@@ -141,16 +141,18 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool isFavorite = false;
+  bool isFavorite = false; // variabel untuk menyimpan data produk yang dipilih menjadi produk favorit atau bukan 
   final formatCurrency =
       NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
 
+  // memanggil fungsi pengecekan favorit saat init state
   @override
   void initState() {
     super.initState();
     checkIfFavorite();
   }
 
+  // fungsi untuk mengecek status favorit pada tiap produk, apakah dipilih menjadi produk favorit atau tidak    
   Future<void> checkIfFavorite() async {
     final token = await getToken();
     if (token != null) {
@@ -171,6 +173,7 @@ class _ProductCardState extends State<ProductCard> {
     }
   }
 
+  // fungsi untuk memilih / membatalkan produk dari status produk favorit 
   Future<void> toggleFavorite() async {
     final token = await getToken();
     if (token != null) {
@@ -181,6 +184,7 @@ class _ProductCardState extends State<ProductCard> {
         },
       );
 
+      if (!mounted) return;
       if (response.statusCode == 200) {
         setState(() {
           isFavorite = !isFavorite; // Toggle favorite state
@@ -189,6 +193,7 @@ class _ProductCardState extends State<ProductCard> {
     }
   }
 
+  // fungsi untuk mendapatkan data token dari user
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token'); // Retrieve token from SharedPreferences
@@ -196,17 +201,22 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    // mengambil data tanggal hari ini (current time)
     DateTime today = DateTime.now();
+
+    // mengambil data tanggal kadaluarsa terdekat tiap produk
     DateTime? nearestExpDate = widget.product.stocks.isNotEmpty
         ? widget.product.stocks.first.expDate
         : null;
 
+    // mencari dat tanggal kadaluarsa yang durasinya 90 hari lagi
     bool isExpiringSoon = nearestExpDate != null &&
         today.isBefore(nearestExpDate) &&
         today.add(const Duration(days: 90)).isAfter(nearestExpDate);
 
+    // container untuk widget card 
     return Container(
-      width: 200,
+      width: 250,
       margin: const EdgeInsets.only(right: 16),
       // decoration: BoxDecoration(
       //   color: isExpiringSoon ? Colors.orange[100] : Colors.white,
@@ -216,6 +226,7 @@ class _ProductCardState extends State<ProductCard> {
       //   ],
       // ),
 
+      // pengaturan warna pada box berdasarkan kondisi produk 
       decoration: BoxDecoration(
         color: widget.product.totalStock == 0
             ? Colors.red[100]
@@ -230,16 +241,42 @@ class _ProductCardState extends State<ProductCard> {
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image(
-              image: widget.product.imageUrl.isNotEmpty
-                  ? NetworkImage(
-                      "$responseUrl/storage/${widget.product.imageUrl}")
-                  : const AssetImage('assets/images/product.png')
-                      as ImageProvider,
-              width: 200,
-              height: 120,
-              fit: BoxFit.cover,
-            ),
+            // child: Image(
+            //   image: widget.product.imageUrl.isNotEmpty
+            //       ? NetworkImage(
+            //           "$responseUrl/storage/${widget.product.imageUrl}")
+            //       : const AssetImage('assets/images/product.png')
+            //           as ImageProvider,
+            //   width: 200,
+            //   height: 120,
+            //   fit: BoxFit.fill,
+            // ),
+
+            // mengatur gambar yang ditampilkan pada aplikasi
+            child: widget.product.imageUrl.isNotEmpty
+                // menampilkan gambar dari storage pada backend dengan api call
+                ? Image.network(
+                    "$responseUrl/public/storage/${widget.product.imageUrl}",
+                    width: 250,
+                    height: 140,
+                    fit: BoxFit.fill,
+                    // jika gagal di load, akan memunculkan gambar default
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/product.png',
+                        width: 250,
+                        height: 140,
+                        fit: BoxFit.fill,
+                      );
+                    },
+                  )
+                  // jika tidak ada gambar (kosong), akan memunculkan gambar default
+                : Image.asset(
+                    'assets/images/product.png',
+                    width: 250,
+                    height: 140,
+                    fit: BoxFit.fill,
+                  ),
           ),
           Expanded(
             child: Padding(
@@ -251,6 +288,7 @@ class _ProductCardState extends State<ProductCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
+                        // nama produk
                         child: Text(
                           widget.product.name,
                           style: const TextStyle(
@@ -258,6 +296,7 @@ class _ProductCardState extends State<ProductCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      // ikon favorit untuk memilih / membatalkan status favorit produk terkait
                       IconButton(
                         icon: isFavorite
                             ? const Icon(
@@ -273,6 +312,7 @@ class _ProductCardState extends State<ProductCard> {
                     ],
                   ),
                   const SizedBox(height: 4),
+                  // deskripsi produk
                   Text(
                     widget.product.description,
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -280,6 +320,7 @@ class _ProductCardState extends State<ProductCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
+                  // kategori produk terkait
                   Text(
                     "Kategori: ${widget.product.category ?? 'Tidak ada'}",
                     style: const TextStyle(fontSize: 12, color: Colors.black54),
@@ -287,23 +328,49 @@ class _ProductCardState extends State<ProductCard> {
                     maxLines: 1,
                   ),
                   const SizedBox(height: 4),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Text(
+                  //       "Stock: ${widget.product.totalStock}",
+                  //       style: const TextStyle(fontSize: 12),
+                  //     ),
+                  //     Text(
+                  //       "${formatCurrency.format(widget.product.price)}",
+                  //       style: const TextStyle(
+                  //           fontSize: 14,
+                  //           fontWeight: FontWeight.bold,
+                  //           color: Colors.blue),
+                  //     ),
+                  //   ],
+                  // ),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Stock: ${widget.product.totalStock}",
-                        style: const TextStyle(fontSize: 12),
+                      Expanded(
+                  // total stok dari produk terkait
+                        child: Text(
+                          "Stock: ${widget.product.totalStock}",
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      const SizedBox(width: 8), 
+                      // harga produk
                       Text(
                         "${formatCurrency.format(widget.product.price)}",
                         style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 4),
+                  // tanggal kadaluarsa terdekat dari produk terkait
                   Text(
                     "Exp: ${nearestExpDate != null ? DateFormat('yyyy-MM-dd').format(nearestExpDate) : 'Tidak ada'}",
                     style: TextStyle(

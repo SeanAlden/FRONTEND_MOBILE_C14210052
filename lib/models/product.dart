@@ -359,16 +359,16 @@
 import 'package:intl/intl.dart';
 
 class Product {
-  final int id;
-  final String name;
-  final String description;
-  final String imageUrl;
-  final double price;
-  final String? category;
-  final List<ProductStock> stocks;
+  final int id; // id produk
+  final String name; // nama produk
+  final String description; // deskripsi produk
+  final String imageUrl; // url gambar produk
+  final double price; // harga produk
+  final String? category; // kategori produk
+  final List<ProductStock> stocks; // stok produk
 
   Product({
-    required this.id,
+    required this.id, 
     required this.name,
     required this.description,
     required this.imageUrl,
@@ -377,6 +377,7 @@ class Product {
     required this.stocks,
   });
 
+  // mengambil data API
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] ?? 0,
@@ -395,10 +396,10 @@ class Product {
     );
   }
 
-  // Mendapatkan total stok dari semua entri `product_stocks`
+  // mendapatkan total stok dari semua data stok produk di ProductStock
   int get totalStock => stocks.fold(0, (sum, stock) => sum + stock.stock);
 
-  // Mendapatkan tanggal kedaluwarsa terdekat
+  // mendapatkan tanggal kedaluwarsa terdekat
   // String get nearestExpDate {
   ProductStock? get nearestExpDate {
     // if (stocks.isEmpty) return "No Exp Date";
@@ -411,13 +412,14 @@ class Product {
     return validStocks.first;
   }
 
+  // mendapatkan tanggal kedaluwarsa terdekat (fifo)
   String get fifoExp {
     if (stocks.isEmpty) return "No Exp Date";
     stocks.sort((a, b) => a.expDate.compareTo(b.expDate));
     return DateFormat('yyyy-MM-dd').format(stocks.first.expDate);
   }
 
-  // Mendapatkan daftar stok berdasarkan tanggal kedaluwarsa
+  // mendapatkan daftar stok berdasarkan tiap tanggal kedaluwarsa
   List<Map<String, dynamic>> get stockByExpDate {
     stocks.sort((a, b) => a.expDate.compareTo(b.expDate));
     return stocks.map((stock) {
@@ -429,19 +431,30 @@ class Product {
   }
 }
 
+// class untuk menyimpan stok produk pada tiap tanggal expired
 class ProductStock {
-  final DateTime expDate;
-  final int stock;
+  final DateTime expDate; // mendapatkan tanggal expired
+  final int stock; // mendapatkan stok pada tanggal expired terkait
 
   ProductStock({
     required this.expDate,
     required this.stock,
   });
 
+  // factory ProductStock.fromJson(Map<String, dynamic> json) {
+  //   return ProductStock(
+  //     expDate: DateTime.parse(json['exp_date']),
+  //     stock: json['stock'] ?? 0,
+  //   );
+  // }
+
+  // mengambil data API
   factory ProductStock.fromJson(Map<String, dynamic> json) {
     return ProductStock(
       expDate: DateTime.parse(json['exp_date']),
-      stock: json['stock'] ?? 0,
+      stock: (json['stock'] is String)
+          ? int.tryParse(json['stock']) ?? 0
+          : json['stock'] ?? 0,
     );
   }
 }

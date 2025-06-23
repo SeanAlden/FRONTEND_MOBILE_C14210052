@@ -25,20 +25,21 @@ class _ProductScreenState extends State<ProductScreen> {
   bool loading = true;
   String categoryName = "Products";
   final formatCurrency =
-        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
 
   @override
   void initState() {
     super.initState();
     fetchCategoryName();
     fetchProducts();
-    loadAllFavorites(); 
+    loadAllFavorites();
   }
 
   Future<void> fetchCategoryName() async {
     try {
       final response = await http
           .get(Uri.parse('$responseUrl/api/categories/${widget.categoryId}'));
+    if (!mounted) return;
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
@@ -90,6 +91,7 @@ class _ProductScreenState extends State<ProductScreen> {
         },
       );
 
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> favoriteIds = data['favoriteProductIds'];
@@ -115,7 +117,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Future<void> fetchProducts() async {
     try {
       final response = await http.get(Uri.parse(
-          '$responseUrl/api/active/products/category/${widget.categoryId}'));
+          '$responseUrl/api/products/active/category/${widget.categoryId}'));
       // '${responseUrl}/api/categories/${widget.categoryId}'));
 
       if (response.statusCode == 200) {
@@ -207,6 +209,10 @@ class _ProductScreenState extends State<ProductScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(categoryName, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
@@ -245,7 +251,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 0.60,
+                  childAspectRatio: 0.55,
                 ),
                 itemCount: _filteredProducts.length,
                 // itemBuilder: (context, index) {
@@ -378,16 +384,16 @@ class _ProductScreenState extends State<ProductScreen> {
                             borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(10)),
                             child: Image.network(
-                              "$responseUrl/storage/${product.imageUrl}",
+                              "$responseUrl/public/storage/${product.imageUrl}",
                               height: 110,
                               width: double.infinity,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fill,
                               errorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
                                 'assets/images/product.png',
                                 height: 120,
                                 width: double.infinity,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.fill,
                               ),
                             ),
                           ),
@@ -426,28 +432,64 @@ class _ProductScreenState extends State<ProductScreen> {
                                       color: Colors.blue),
                                 ),
                                 const SizedBox(height: 5),
-                                Row(children: [
-                                  Text(
-                                    "Exp: ${product.fifoExp}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: isExpiringSoon
-                                          ? Colors.red
-                                          : Colors.black,
+                                // Row(children: [
+                                //   Text(
+                                //     "Exp: ${product.fifoExp}",
+                                //     style: TextStyle(
+                                //       fontSize: 13,
+                                //       fontWeight: FontWeight.bold,
+                                //       color: isExpiringSoon
+                                //           ? Colors.red
+                                //           : Colors.black,
+                                //     ),
+                                //   ),
+                                //   IconButton(
+                                //     icon: (_favoriteStatus[product.id] ?? false)
+                                //         ? const Icon(Icons.favorite,
+                                //             color: Colors.red)
+                                //         : const Icon(Icons.favorite_border,
+                                //             color: Colors.grey),
+                                //     onPressed: () {
+                                //       toggleFavorite(product.id);
+                                //     },
+                                //   ),
+                                // ])
+
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "Exp: ${product.fifoExp}",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: isExpiringSoon
+                                              ? Colors.red
+                                              : Colors.black,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: (_favoriteStatus[product.id] ?? false)
-                                        ? const Icon(Icons.favorite,
-                                            color: Colors.red)
-                                        : const Icon(Icons.favorite_border,
-                                            color: Colors.grey),
-                                    onPressed: () {
-                                      toggleFavorite(product.id);
-                                    },
-                                  ),
-                                ])
+                                    IconButton(
+                                      padding: EdgeInsets
+                                          .zero, // Menghindari padding bawaan
+                                      constraints:
+                                          const BoxConstraints(), // Supaya ukurannya kecil
+                                      icon: (_favoriteStatus[product.id] ??
+                                              false)
+                                          ? const Icon(Icons.favorite,
+                                              color: Colors.red, size: 20)
+                                          : const Icon(Icons.favorite_border,
+                                              color: Colors.grey, size: 20),
+                                      onPressed: () {
+                                        toggleFavorite(product.id);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),

@@ -240,6 +240,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
         ),
         centerTitle: true,
         backgroundColor: Colors.blue,
+        automaticallyImplyLeading: false,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

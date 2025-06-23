@@ -143,12 +143,13 @@
 
 import 'package:flutter/material.dart';
 
+// widget quantity selector
 class QuantitySelectorCart extends StatefulWidget {
-  final int cartId;
-  final int quantity;
-  final int stock;
-  final DateTime expiredDate;
-  final Function(int, int, int, DateTime) updateQuantity;
+  final int cartId; // mencari cart id
+  final int quantity; // kuantitas yang dipilih
+  final int stock; // stok produk pada tanggal yg dipilih
+  final DateTime expiredDate; // tanggal kadaluarsa
+  final Function(int, int, int, DateTime) updateQuantity; // fungsi update kuantitas
 
   const QuantitySelectorCart({super.key, 
     required this.cartId,
@@ -171,6 +172,7 @@ class _QuantitySelectorCartState extends State<QuantitySelectorCart> {
     currentQuantity = widget.quantity;
   }
 
+  // fungsi mengubah kuantitas produk
   void changeQuantity(int newQuantity) {
     if (newQuantity > 0 && newQuantity <= widget.stock) {
       setState(() {
@@ -184,11 +186,13 @@ class _QuantitySelectorCartState extends State<QuantitySelectorCart> {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // menghapus kuantitas
         IconButton(
           icon: const Icon(Icons.remove),
           onPressed: () => changeQuantity(currentQuantity - 1),
         ),
         Text("$currentQuantity"),
+        // menambah kuantitas
         IconButton(
           icon: const Icon(Icons.add),
           onPressed: () => changeQuantity(currentQuantity + 1),

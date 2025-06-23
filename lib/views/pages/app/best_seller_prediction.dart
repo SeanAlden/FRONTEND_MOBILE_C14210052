@@ -379,7 +379,7 @@ class _BestSellerPredictionState extends State<BestSellerPrediction> {
                               child: (product['photo'] != null &&
                                       product['photo'].toString().isNotEmpty)
                                   ? Image.network(
-                                      "$responseUrl/storage/${product['photo']}",
+                                      "$responseUrl/public/storage/${product['photo']}",
                                       width: 100,
                                       height: 100,
                                       fit: BoxFit.cover,

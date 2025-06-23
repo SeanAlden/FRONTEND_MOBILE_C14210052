@@ -257,102 +257,187 @@ class _LoginPageState extends State<LoginPage> {
   //   }
   // }
 
+  // Future<void> loginUser() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   final response = await http.post(
+  //     Uri.parse('$responseUrl/api/auth/login'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'email': emailController.text.trim(),
+  //       'password': passwordController.text,
+  //     }),
+  //   );
+
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+
+  //   if (response.statusCode == 200) {
+  //     final token = response.body;
+
+  //     // Simpan token dulu
+  //     final prefs = await SharedPreferences.getInstance();
+  //     await prefs.setString('token', token);
+
+  //     // Ambil semua user
+  //     final usersResponse = await http.get(
+  //       Uri.parse('$responseUrl/api/auth/users'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //     );
+
+  //     if (usersResponse.statusCode == 200) {
+  //       final usersData = jsonDecode(usersResponse.body);
+  //       final List<dynamic> users = usersData['data'];
+
+  //       // Cari user yang email-nya sesuai dengan input login
+  //       final currentUser = users.firstWhere(
+  //         (user) => user['email'] == emailController.text.trim(),
+  //         orElse: () => null,
+  //       );
+
+  //       if (currentUser != null) {
+  //         final userId = currentUser['id'] as int?;
+  //         await prefs.setString('namaUser', currentUser['name']);
+  //         // Tambahkan ini:
+  //         // await prefs.setInt(
+  //         //     'user_id', currentUser['id']); // <--- ini yang wajib
+  //         if (userId != null) {
+  //           await prefs.setInt('user_id', userId);
+  //         }
+  //         await prefs.setString(
+  //             'profileImage', currentUser['profile_image'] ?? '');
+  //       }
+  //     }
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text(
+  //           "Login Berhasil!",
+  //           style: TextStyle(color: Colors.white),
+  //         ),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const MainScreen()),
+  //     );
+  //   }
+  //   // else {
+  //   //   final error = jsonDecode(response.body);
+  //   //   ScaffoldMessenger.of(context).showSnackBar(
+  //   //     SnackBar(content: Text(error['message'] ?? "Login gagal")),
+  //   //   );
+  //   // }
+
+  //   else {
+  //     final contentType = response.headers['content-type'];
+
+  //     if (contentType != null && contentType.contains('application/json')) {
+  //       final error = jsonDecode(response.body);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(error['message'] ?? "Login gagal")),
+  //       );
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text(
+  //             "Login gagal. Email atau password salah.",
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //           backgroundColor: Colors.red,
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
+
+  // fungsi login
   Future<void> loginUser() async {
     setState(() {
       _isLoading = true;
     });
 
-    final response = await http.post(
-      Uri.parse('$responseUrl/api/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': emailController.text.trim(),
-        'password': passwordController.text,
-      }),
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      final token = response.body;
-
-      // Simpan token dulu
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-
-      // Ambil semua user
-      final usersResponse = await http.get(
-        Uri.parse('$responseUrl/api/auth/users'),
+    try {
+      final response = await http.post(
+        Uri.parse('$responseUrl/api/auth/signin'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
         },
+        body: jsonEncode({
+          'email': emailController.text.trim(),
+          'password': passwordController.text,
+        }),
       );
 
-      if (usersResponse.statusCode == 200) {
-        final usersData = jsonDecode(usersResponse.body);
-        final List<dynamic> users = usersData['data'];
+      setState(() {
+        _isLoading = false;
+      });
 
-        // Cari user yang email-nya sesuai dengan input login
-        final currentUser = users.firstWhere(
-          (user) => user['email'] == emailController.text.trim(),
-          orElse: () => null,
-        );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        final token = responseData['token'];
+        final user = responseData['user'];
 
-        if (currentUser != null) {
-          await prefs.setString('namaUser', currentUser['name']);
-          // Tambahkan ini:
-          await prefs.setInt(
-              'user_id', currentUser['id']); // <--- ini yang wajib
-          // await prefs.setString('profileImage', currentUser['profile_image']);
-          await prefs.setString(
-              'profileImage', currentUser['profile_image'] ?? '');
+        // Simpan token dan user info
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('namaUser', user['name']);
+        // await prefs.setInt('user_id', user['id']);
+        if (user['id'] != null) {
+          await prefs.setInt('user_id', user['id']);
         }
-      }
+        await prefs.setString('profileImage', user['profile_image'] ?? '');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Login Berhasil!",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
-    }
-    // else {
-    //   final error = jsonDecode(response.body);
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text(error['message'] ?? "Login gagal")),
-    //   );
-    // }
-
-    else {
-      final contentType = response.headers['content-type'];
-
-      if (contentType != null && contentType.contains('application/json')) {
-        final error = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error['message'] ?? "Login gagal")),
-        );
-      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              "Login gagal. Email atau password salah.",
+              "Login Berhasil!",
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.green,
           ),
         );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      } else {
+        final contentType = response.headers['content-type'];
+        if (contentType != null && contentType.contains('application/json')) {
+          final error = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error['message'] ?? "Login gagal")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Login gagal. Email atau password salah.",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Terjadi kesalahan: $e")),
+      );
     }
   }
 
@@ -415,6 +500,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
+                // tombol login untuk memanggil fungsi login
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

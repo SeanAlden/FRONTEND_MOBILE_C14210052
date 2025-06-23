@@ -603,7 +603,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadDataUser(); 
+    _loadDataUser();
   }
 
   // Future<void> _loadDataUser() async {
@@ -720,11 +720,61 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> logoutUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await http.delete(
+        Uri.parse('$responseUrl/api/auth/signout'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Hapus token dan data user dari SharedPreferences
+        await prefs.remove('token');
+        await prefs.remove('user_id');
+        await prefs.remove('namaUser');
+        await prefs.remove('profileImage');
+
+        // Navigasi ke halaman login atau welcome
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Berhasil logout!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Gagal logout: ${response.body}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Terjadi kesalahan: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await _loadDataUser(); 
+        await _loadDataUser();
         return true;
       },
       child: Scaffold(
@@ -740,6 +790,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.blue,
+          automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -754,24 +805,62 @@ class _ProfilePageState extends State<ProfilePage> {
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
+                        // CircleAvatar(
+                        //   radius: 50,
+                        //   backgroundColor: Colors.grey[600],
+                        //   backgroundImage: _selectedImage != null
+                        //       ? FileImage(_selectedImage!)
+                        //       : _profileImage != null
+                        //           ? NetworkImage(
+                        //                   '$responseUrl/storage/profile_images/$_profileImage')
+                        //               as ImageProvider
+                        //           : null,
+                        //   child:
+                        //       (_selectedImage == null && _profileImage == null)
+                        //           ? const Icon(
+                        //               Icons.person,
+                        //               size: 50,
+                        //               color: Colors.white,
+                        //             )
+                        //           : null,
+                        // ),
+
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.grey[600],
-                          backgroundImage: _selectedImage != null
-                              ? FileImage(_selectedImage!)
-                              : _profileImage != null
-                                  ? NetworkImage(
-                                          '$responseUrl/storage/profile_images/$_profileImage')
-                                      as ImageProvider
-                                  : null,
-                          child:
-                              (_selectedImage == null && _profileImage == null)
-                                  ? const Icon(
+                          child: _selectedImage != null
+                              ? ClipOval(
+                                  child: Image.file(
+                                    _selectedImage!,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : (_profileImage != null &&
+                                      _profileImage!.isNotEmpty)
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        '$responseUrl/public/storage/profile_images/$_profileImage',
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/profile.png',
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
+                                    )
+                                  : const Icon(
                                       Icons.person,
                                       size: 50,
                                       color: Colors.white,
-                                    )
-                                  : null,
+                                    ),
                         ),
                         GestureDetector(
                           onTap: _pickImage,
@@ -888,39 +977,43 @@ class _ProfilePageState extends State<ProfilePage> {
             child: const Text("Cancel"),
           ),
           TextButton(
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              final token = prefs.getString('token');
+            onPressed: ()
+                // async {
+                //   final prefs = await SharedPreferences.getInstance();
+                //   final token = prefs.getString('token');
 
-              if (token != null) {
-                final response = await http.get(
-                  Uri.parse('$responseUrl/api/auth/logout'),
-                  headers: {
-                    'Authorization': 'Bearer $token',
-                    'Accept': 'application/json',
-                  },
-                );
+                //   if (token != null) {
+                //     final response = await http.get(
+                //       Uri.parse('$responseUrl/api/auth/logout'),
+                //       headers: {
+                //         'Authorization': 'Bearer $token',
+                //         'Accept': 'application/json',
+                //       },
+                //     );
 
-                if (response.statusCode == 200) {
-                  await prefs.clear(); // Hapus semua data user
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                    (route) => false,
-                  );
-                } else {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Failed to logout. Try again.')),
-                  );
-                }
-              } else {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('No user logged in.')),
-                );
-              }
+                //     if (response.statusCode == 200) {
+                //       await prefs.clear(); // Hapus semua data user
+                //       Navigator.pushAndRemoveUntil(
+                //         context,
+                //         MaterialPageRoute(builder: (context) => const LoginPage()),
+                //         (route) => false,
+                //       );
+                //     } else {
+                //       Navigator.pop(context);
+                //       ScaffoldMessenger.of(context).showSnackBar(
+                //         const SnackBar(
+                //             content: Text('Failed to logout. Try again.')),
+                //       );
+                //     }
+                //   } else {
+                //     Navigator.pop(context);
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('No user logged in.')),
+                //     );
+                //   }
+                // },
+                {
+              logoutUser();
             },
             child: const Text("Log Out", style: TextStyle(color: Colors.red)),
           ),

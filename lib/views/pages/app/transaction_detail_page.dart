@@ -962,6 +962,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ta_c14210052/constant/api_url.dart';
+import 'package:ta_c14210052/models/product.dart';
 import 'package:ta_c14210052/models/transaction.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -996,7 +997,6 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         'Accept': 'application/json',
       },
     );
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return Transaction.fromJson(data);
@@ -1111,16 +1111,16 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.info_outline, color: Colors.blueAccent),
-              SizedBox(width: 8),
-              Text(
-                "Informasi Transaksi",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+            const Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.blueAccent),
+                SizedBox(width: 8),
+                Text(
+                  "Informasi Transaksi",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           const SizedBox(height: 8),
           const Divider(thickness: 1),
           const SizedBox(height: 8),
@@ -1141,12 +1141,15 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 // Widget bantu untuk menyusun label dan nilai sejajar
   Widget _buildInfoRow(String label, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
-        Text(value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-      ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  overflow: TextOverflow.ellipsis)),
+        ],
     );
   }
 
@@ -1201,6 +1204,45 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     );
   }
 
+  // Widget _buildProductList(
+  //     Transaction transaction, NumberFormat formatCurrency) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text("Products",
+  //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  //       const SizedBox(height: 8),
+  //       ...transaction.details.map((detail) => Card(
+  //             elevation: 2,
+  //             margin: const EdgeInsets.symmetric(vertical: 8),
+  //             color: Colors.grey[200],
+  //             child: ListTile(
+  //               leading: detail.photo != null && detail.photo!.isNotEmpty
+  //                   ? Image.network(
+  //                       '$responseUrl/storage/${detail.photo}',
+  //                       width: 50,
+  //                       height: 50,
+  //                       fit: BoxFit.cover,
+  //                     )
+  //                   : Image.asset('assets/images/product.png',
+  //                       width: 50, height: 50, fit: BoxFit.cover),
+  //               title: Text('${detail.name} (${detail.code})'),
+  //               subtitle: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text("Harga: ${formatCurrency.format(detail.price ?? 0)}"),
+  //                   Text("Exp Date: ${detail.expDate}"),
+  //                   Text("Jumlah: ${detail.quantity ?? 0}"),
+  //                   Text(
+  //                       "Total: ${formatCurrency.format((detail.quantity ?? 0) * (detail.price ?? 0))}"),
+  //                 ],
+  //               ),
+  //             ),
+  //           )),
+  //     ],
+  //   );
+  // }
+
   Widget _buildProductList(
       Transaction transaction, NumberFormat formatCurrency) {
     return Column(
@@ -1209,35 +1251,104 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         const Text("Products",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        ...transaction.details.map((detail) => Card(
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              color: Colors.grey[200],
-              child: ListTile(
-                leading: detail.photo != null && detail.photo!.isNotEmpty
-                    ? Image.network(
-                        '$responseUrl/storage/${detail.photo}',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset('assets/images/product.png',
-                        width: 50, height: 50, fit: BoxFit.cover),
-                title: Text('${detail.name} (${detail.code})'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Harga: ${formatCurrency.format(detail.price ?? 0)}"),
-                    Text("Jumlah: ${detail.quantity ?? 0}"),
-                    Text(
-                        "Total: ${formatCurrency.format((detail.quantity ?? 0) * (detail.price ?? 0))}"),
-                  ],
-                ),
-              ),
-            )),
+        ...transaction.details
+            .where((detail) => (detail.quantity ?? 0) > 0) // Filter jumlah > 0
+            .map((detail) => Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  color: Colors.grey[200],
+                  child: ListTile(
+                    leading:
+                        // detail.photo != null && detail.photo!.isNotEmpty
+                        //     ? Image.network(
+                        //         '$responseUrl/storage/${detail.photo}',
+                        //         width: 50,
+                        //         height: 50,
+                        //         fit: BoxFit.cover,
+                        //       )
+                        //     : Image.asset('assets/images/product.png',
+                        //         width: 50, height: 50, fit: BoxFit.cover),
+
+                        (detail.photo!.isNotEmpty)
+                            ? Image.network(
+                                '$responseUrl/public/storage/${detail.photo}',
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/product.png',
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'assets/images/product.png',
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                    title: Text('${detail.name} (${detail.code})'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            "Harga: ${formatCurrency.format(detail.price ?? 0)}"),
+                        Text("Exp Date: ${detail.expDate}"),
+                        Text("Jumlah: ${detail.quantity ?? 0}"),
+                        Text(
+                            "Total: ${formatCurrency.format((detail.quantity ?? 0) * (detail.price ?? 0))}"),
+                      ],
+                    ),
+                  ),
+                )),
       ],
     );
   }
+
+  // Widget _buildProductList(
+  //     Transaction transaction, NumberFormat formatCurrency) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text("Products",
+  //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  //       const SizedBox(height: 8),
+  //       ...transaction.details
+  //           .where((detail) => (detail.quantity ?? 0) > 0) // Filter jumlah > 0
+  //           .map((detail) => Card(
+  //                 elevation: 2,
+  //                 margin: const EdgeInsets.symmetric(vertical: 8),
+  //                 color: Colors.grey[200],
+  //                 child: ListTile(
+  //                   leading: detail.product?.imageUrl.isNotEmpty == true
+  //                       ? Image.network(
+  //                           '$responseUrl/storage/${detail.product!.imageUrl}', // Use imageUrl from Product
+  //                           width: 50,
+  //                           height: 50,
+  //                           fit: BoxFit.cover,
+  //                         )
+  //                       : Image.asset('assets/images/product.png',
+  //                           width: 50, height: 50, fit: BoxFit.cover),
+  //                   title: Text('${detail.name} (${detail.code})'),
+  //                   subtitle: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                           "Harga: ${formatCurrency.format(detail.price ?? 0)}"),
+  //                       Text("Exp Date: ${detail.expDate}"),
+  //                       Text("Jumlah: ${detail.quantity ?? 0}"),
+  //                       Text(
+  //                           "Total: ${formatCurrency.format((detail.quantity ?? 0) * (detail.price ?? 0))}"),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               )),
+  //     ],
+  //   );
+  // }
 
   Widget _buildShippingMethod(Transaction transaction) {
     return Container(
@@ -1339,11 +1450,15 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontWeight: isEmphasized ? FontWeight.bold : FontWeight.normal,
-            fontSize: 14,
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontWeight: isEmphasized ? FontWeight.bold : FontWeight.normal,
+              fontSize: 14,
+            overflow: TextOverflow.ellipsis
+            ),
+            maxLines: 2,
           ),
         ),
         Text(

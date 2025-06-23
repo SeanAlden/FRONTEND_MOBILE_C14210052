@@ -5,8 +5,10 @@ import 'package:ta_c14210052/models/transaction_response.dart';
 import 'package:ta_c14210052/views/pages/app/transaction_detail_page.dart';
 
 class TransactionItemCard extends StatelessWidget {
-  final TransactionResponse transactionResponse;
-  final VoidCallback? onRefresh;
+  final TransactionResponse
+      transactionResponse; // untuk mengambil data transaksi
+  final VoidCallback?
+      onRefresh; // memperbarui tampilan widget langsung jika pemanggilan data dari api nya berubah
 
   const TransactionItemCard({
     super.key,
@@ -16,12 +18,15 @@ class TransactionItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final transaction = transactionResponse.transaction;
-    final firstProduct =
-        transaction.details.isNotEmpty ? transaction.details[0] : null;
-    final remainingProductCount = transaction.details.length - 1;
-    final formatCurrency =
-        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
+    final transaction =
+        transactionResponse.transaction; // mengambil data transaksi
+    final firstProduct = transaction.details.isNotEmpty
+        ? transaction.details[0]
+        : null; // mengambil data salah satu produk dari tiap transaksi
+    final remainingProductCount = transaction.details.length -
+        1; // menghitung jumlah produk dalam tiap transaksi
+    final formatCurrency = NumberFormat.currency(
+        locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2); // format harga
 
     return GestureDetector(
       // onTap: () {
@@ -34,6 +39,7 @@ class TransactionItemCard extends StatelessWidget {
       //   );
       // },
 
+      // mengarahkan user ke halaman detail transaksi berdasarkan id transaksi yang di tap
       onTap: () async {
         await Navigator.push(
           context,
@@ -57,24 +63,55 @@ class TransactionItemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Kode Transaksi & Tanggal
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       transaction.transactionCode ?? '-',
+              //       style: const TextStyle(
+              //           fontWeight: FontWeight.bold, fontSize: 16),
+              //     ),
+              //     Text(
+              //       DateFormat('dd MMM yyyy, HH:mm')
+              //           .format(transaction.transactionDate),
+              //       style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              //       overflow: TextOverflow.ellipsis,
+              //       maxLines: 1,
+              //     ),
+              //   ],
+              // ),
+
+              // menampilkan data transaksi
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    transaction.transactionCode ?? '-',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                  Expanded(
+                    // kode transaksi
+                    child: Text(
+                      transaction.transactionCode ?? '-',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
                   ),
+                  const SizedBox(width: 8),
+                  // waktu transaksi
                   Text(
                     DateFormat('dd MMM yyyy, HH:mm')
                         .format(transaction.transactionDate),
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ],
               ),
+
               const SizedBox(height: 8),
 
-              // Status Transaksi
+              // widget status transaksi
               Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
@@ -90,14 +127,14 @@ class TransactionItemCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Produk
+              // menampilkan produk
               if (firstProduct != null) ...[
                 Row(
                   children: [
                     ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
-                          "$responseUrl/storage/${firstProduct.photo}",
+                          "$responseUrl/public/storage/${firstProduct.product!.imageUrl}",
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,
@@ -108,23 +145,38 @@ class TransactionItemCard extends StatelessWidget {
                           errorBuilder: (context, error, stackTrace) =>
                               Image.asset(
                             'assets/images/product.png',
-                            height: 120,
-                            width: double.infinity,
+                            height: 60,
+                            width: 60,
                             fit: BoxFit.cover,
                           ),
-                        )),
+                        )
+                        //     Image(
+                        //   // borderRadius: BorderRadius.circular(8),
+                        //   image: firstProduct.photo!.isNotEmpty
+                        //       ? NetworkImage(
+                        //           "$responseUrl/storage/${firstProduct.photo}")
+                        //       : const AssetImage('assets/images/product.png')
+                        //           as ImageProvider,
+                        //   width: 60,
+                        //   height: 60,
+                        //   fit: BoxFit.cover,
+                        // ),
+                        ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // nama salah satu produk yang terdapat pada transaksi terkait
                           Text(firstProduct.name ?? 'Unknown',
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
+                          // menampilkan tanggal kadaluarsa dari produk terkait
                           Text('Exp : ${firstProduct.expDate}',
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
+                          // menampilkan teks jumlah produk yang ada pada transaksi terkait
                           Text(
                             remainingProductCount > 0
                                 ? 'Klik untuk lihat +$remainingProductCount produk lainnya'
@@ -139,24 +191,26 @@ class TransactionItemCard extends StatelessWidget {
                 const SizedBox(height: 12),
               ],
 
-              // Metode Pengiriman dan Pembayaran
+              // metode pengiriman dan pembayaran
               Row(
                 children: [
                   const Icon(Icons.local_shipping,
                       size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
+                  // metode pengiriman dari transaksi terkait
                   Text(transaction.shippingMethod ?? 'Tidak ada',
                       style: const TextStyle(fontSize: 13)),
                   const SizedBox(width: 16),
                   const Icon(Icons.payment, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
+                  // metode pembayaran dari transaksi terkait
                   Text(transaction.paymentMethod ?? 'Cash',
                       style: const TextStyle(fontSize: 13)),
                 ],
               ),
               const SizedBox(height: 12),
 
-              // Total
+              // total biaya dari transaksi terkait
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
@@ -172,6 +226,7 @@ class TransactionItemCard extends StatelessWidget {
     );
   }
 
+  // mengatur warna UI pada bagian status transaksi
   Color getStatusColor(String status) {
     switch (status) {
       case 'Pembayaran lunas':

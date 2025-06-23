@@ -397,7 +397,8 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage> {
   List<Product> favoriteProducts = [];
-  final String apiUrl = '$responseUrl/api/favorites';
+  // final String apiUrl = '$responseUrl/api/favorites';
+  final String apiUrl = '$responseUrl/api/user-favorites';
   bool isLoading = true; // <-- ini ditambahkan
 
   @override
@@ -405,6 +406,37 @@ class _FavoritePageState extends State<FavoritePage> {
     super.initState();
     fetchFavorites();
   }
+
+  // Future<void> fetchFavorites() async {
+  //   final token = await getToken();
+  //   final response = await http.get(
+  //     Uri.parse(apiUrl),
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     final data = json.decode(response.body);
+  //     if (mounted) {
+  //       setState(() {
+  //         favoriteProducts = (data['favorites'] as List)
+  //             .map((item) => Product.fromJson(item))
+  //             .toList();
+
+  //         // favoriteProducts = (data['favoriteProductIds'] as List)
+  //         //     .map((item) => Product.fromJson(item))
+  //         //     .toList();
+
+  //         isLoading = false; // <-- loading selesai
+  //       });
+  //     }
+  //   } else {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false; // <-- bahkan jika gagal, matikan loading
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> fetchFavorites() async {
     final token = await getToken();
@@ -418,15 +450,18 @@ class _FavoritePageState extends State<FavoritePage> {
       if (mounted) {
         setState(() {
           favoriteProducts = (data['favorites'] as List)
+              .where(
+                  (item) => item['condition'] == 'active') // hanya produk aktif
               .map((item) => Product.fromJson(item))
               .toList();
-          isLoading = false; // <-- loading selesai
+
+          isLoading = false;
         });
       }
     } else {
       if (mounted) {
         setState(() {
-          isLoading = false; // <-- bahkan jika gagal, matikan loading
+          isLoading = false;
         });
       }
     }
@@ -499,44 +534,215 @@ class _FavoritePageState extends State<FavoritePage> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.70,
+                      childAspectRatio: 0.58,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                     ),
                     itemCount: favoriteProducts.length,
                     itemBuilder: (context, index) {
                       final product = favoriteProducts[index];
-                      return Card(
+                      return
+                          // Card(
+                          //   elevation: 3,
+                          //   shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(10),
+                          //   ),
+                          //   child: Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       // product.imageUrl.isNotEmpty
+                          //       //     ? Container(
+                          //       //         height: 100,
+                          //       //         width: double.infinity,
+                          //       //         decoration: BoxDecoration(
+                          //       //           image: DecorationImage(
+                          //       //             image: NetworkImage(
+                          //       //                 "$responseUrl/storage/${product.imageUrl}"),
+                          //       //             fit: BoxFit.cover,
+                          //       //           ),
+                          //       //           borderRadius: const BorderRadius.only(
+                          //       //             topLeft: Radius.circular(10),
+                          //       //             topRight: Radius.circular(10),
+                          //       //           ),
+                          //       //         ),
+                          //       //       )
+                          //       //     : const Placeholder(fallbackHeight: 100),
+
+                          //       Container(
+                          //         height: 100,
+                          //         width: double.infinity,
+                          //         child: product.imageUrl.isNotEmpty
+                          //             ? Image.network(
+                          //                 "$responseUrl/public/storage/${product.imageUrl}",
+                          //                 fit: BoxFit.fill,
+                          //                 width: double.infinity,
+                          //                 height: 100,
+                          //                 errorBuilder:
+                          //                     (context, error, stackTrace) {
+                          //                   return Image.asset(
+                          //                     'assets/images/product.png',
+                          //                     fit: BoxFit.cover,
+                          //                     width: double.infinity,
+                          //                     height: 100,
+                          //                   );
+                          //                 },
+                          //               )
+                          //             : Image.asset(
+                          //                 'assets/images/product.png',
+                          //                 fit: BoxFit.cover,
+                          //                 width: double.infinity,
+                          //                 height: 100,
+                          //               ),
+                          //       ),
+
+                          //       Padding(
+                          //         padding: const EdgeInsets.all(8.0),
+                          //         child: Column(
+                          //             crossAxisAlignment: CrossAxisAlignment.start,
+                          //             children: [
+                          //               // Row untuk nama dan icon hati
+                          //               Row(
+                          //                 mainAxisAlignment:
+                          //                     MainAxisAlignment.spaceBetween,
+                          //                 children: [
+                          //                   Expanded(
+                          //                     child: Text(
+                          //                       product.name,
+                          //                       style: const TextStyle(
+                          //                         fontWeight: FontWeight.bold,
+                          //                         fontSize: 16,
+                          //                       ),
+                          //                       overflow: TextOverflow.ellipsis,
+                          //                     ),
+                          //                   ),
+                          //                   // IconButton(
+                          //                   //   icon: const Icon(Icons.favorite,
+                          //                   //       color: Colors.red),
+                          //                   //   onPressed: () {
+                          //                   //     // Handle favorite action
+                          //                   //   },
+                          //                   //   padding: EdgeInsets.zero,
+                          //                   //   constraints: const BoxConstraints(),
+                          //                   // ),
+
+                          //                   IconButton(
+                          //                     icon: const Icon(Icons.favorite,
+                          //                         color: Colors.red),
+                          //                     onPressed: () {
+                          //                       showDialog(
+                          //                         context: context,
+                          //                         builder: (context) => AlertDialog(
+                          //                           title: const Text(
+                          //                               'Hapus dari Favorit?'),
+                          //                           content: const Text(
+                          //                               'Apakah kamu yakin ingin menghapus produk ini dari daftar favorit?'),
+                          //                           actions: [
+                          //                             TextButton(
+                          //                               onPressed: () =>
+                          //                                   Navigator.of(context)
+                          //                                       .pop(),
+                          //                               child: const Text('Batal'),
+                          //                             ),
+                          //                             TextButton(
+                          //                               onPressed: () {
+                          //                                 Navigator.of(context)
+                          //                                     .pop();
+                          //                                 toggleFavorite(
+                          //                                     product.id);
+                          //                               },
+                          //                               child:
+                          //                                   const Text('Ya, Hapus'),
+                          //                             ),
+                          //                           ],
+                          //                         ),
+                          //                       );
+                          //                     },
+                          //                     padding: EdgeInsets.zero,
+                          //                     constraints: const BoxConstraints(),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //               const SizedBox(height: 4),
+                          //               Text(
+                          //                 product.description,
+                          //                 maxLines: 2,
+                          //                 overflow: TextOverflow.ellipsis,
+                          //                 style: TextStyle(color: Colors.grey[700]),
+                          //               ),
+                          //               const SizedBox(height: 4),
+                          //               // Row untuk stok dan harga
+                          //               Row(
+                          //                 mainAxisAlignment:
+                          //                     MainAxisAlignment.spaceBetween,
+                          //                 crossAxisAlignment:
+                          //                     CrossAxisAlignment.center,
+                          //                 children: [
+                          //                   Expanded(
+                          //                     child: Row(
+                          //                       mainAxisAlignment:
+                          //                           MainAxisAlignment.spaceBetween,
+                          //                       children: [
+
+                          //                           Text(
+                          //                             'Stock: ${product.totalStock}',
+                          //                             style: const TextStyle(
+                          //                                 fontWeight:
+                          //                                     FontWeight.bold,
+                          //                                 overflow: TextOverflow.ellipsis,
+                          //                                     ),
+                          //                           ),
+                          //                           Text(
+                          //                             'Rp ${product.price.toStringAsFixed(0)}',
+                          //                             style: const TextStyle(
+                          //                               fontWeight: FontWeight.bold,
+                          //                               color: Colors.green,
+                          //                               overflow: TextOverflow.ellipsis
+                          //                             ),
+                          //                           ),
+                          //                       ],
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             ]),
+                          //       )
+                          //     ],
+                          //   ),
+                          // );
+                          Card(
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            product.imageUrl.isNotEmpty
-                                ? Container(
-                                    height: 100,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                            "$responseUrl/storage/${product.imageUrl}"),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
-                                      ),
+                            Container(
+                              height: 100,
+                              width: double.infinity,
+                              child: product.imageUrl.isNotEmpty
+                                  ? Image.network(
+                                      "$responseUrl/public/storage/${product.imageUrl}",
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/product.png',
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      'assets/images/product.png',
+                                      fit: BoxFit.cover,
                                     ),
-                                  )
-                                : const Placeholder(fallbackHeight: 100),
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Row untuk nama dan icon hati
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -549,18 +755,9 @@ class _FavoritePageState extends State<FavoritePage> {
                                             fontSize: 16,
                                           ),
                                           overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
                                         ),
                                       ),
-                                      // IconButton(
-                                      //   icon: const Icon(Icons.favorite,
-                                      //       color: Colors.red),
-                                      //   onPressed: () {
-                                      //     // Handle favorite action
-                                      //   },
-                                      //   padding: EdgeInsets.zero,
-                                      //   constraints: const BoxConstraints(),
-                                      // ),
-
                                       IconButton(
                                         icon: const Icon(Icons.favorite,
                                             color: Colors.red),
@@ -604,21 +801,29 @@ class _FavoritePageState extends State<FavoritePage> {
                                     style: TextStyle(color: Colors.grey[700]),
                                   ),
                                   const SizedBox(height: 4),
-                                  // Row untuk stok dan harga
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'Stock: ${product.totalStock}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                      Flexible(
+                                        child: Text(
+                                          'Stock: ${product.totalStock}',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
-                                      Text(
-                                        'Rp ${product.price.toStringAsFixed(0)}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
+                                      Flexible(
+                                        child: Text(
+                                          'Rp ${product.price.toStringAsFixed(0)}',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                          textAlign: TextAlign.right,
                                         ),
                                       ),
                                     ],

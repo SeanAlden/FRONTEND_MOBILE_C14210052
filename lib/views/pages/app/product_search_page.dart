@@ -361,14 +361,14 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   bool isFavorite = false;
   Map<int, bool> _favoriteStatus = {};
   final formatCurrency =
-        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
 
   @override
   void initState() {
     super.initState();
     _filteredProducts = widget.products;
     _searchController.addListener(_filterProducts);
-    loadAllFavorites(); 
+    loadAllFavorites();
 
     // for (var product in widget.products) {
     //   // checkIfFavorite(product.id); // Cek favorite satu-satu
@@ -442,6 +442,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
         },
       );
 
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> favoriteIds = data['favoriteProductIds'];
@@ -480,8 +481,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     try {
       DateTime exp = DateFormat("yyyy-MM-dd").parse(expDate);
       DateTime now = DateTime.now();
-      return exp.isBefore(now.add(
-          const Duration(days: 90))); 
+      return exp.isBefore(now.add(const Duration(days: 90)));
     } catch (e) {
       return false;
     }
@@ -537,20 +537,48 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // ClipRRect(
+                      //   // borderRadius: const BorderRadius.vertical(
+                      //   // top: Radius.circular(12)),
+                      //   borderRadius: BorderRadius.circular(8),
+                      //   child: Image(
+                      //     // borderRadius: BorderRadius.circular(8),
+                      //     image: product.imageUrl.isNotEmpty
+                      //         ? NetworkImage(
+                      //             "$responseUrl/storage/${product.imageUrl}")
+                      //         : const AssetImage('assets/images/product.png')
+                      //             as ImageProvider,
+                      //     width: 80,
+                      //     height: 80,
+                      //     fit: BoxFit.cover,
+                      //   ),
+                      // ),
+
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12)),
-                        child: Image(
-                          image: product.imageUrl.isNotEmpty
-                              ? NetworkImage(
-                                  "$responseUrl/storage/${product.imageUrl}")
-                              : const AssetImage('assets/images/product.png')
-                                  as ImageProvider,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        child: product.imageUrl.isNotEmpty
+                            ? Image.network(
+                                "$responseUrl/public/storage/${product.imageUrl}",
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.fill,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/product.png',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'assets/images/product.png',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
                       ),
+
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -563,6 +591,11 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                             ),
                             const SizedBox(height: 5),
                             Text(
+                              product.category!,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
                               product.description,
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey[600]),
@@ -570,62 +603,121 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                               maxLines: 2,
                             ),
                             const SizedBox(height: 5),
+                            // Row(
+                            //   children: [
+                            //     Text(
+                            //       "Total Stock: ${product.totalStock}",
+                            //       style: const TextStyle(
+                            //           fontSize: 14,
+                            //           fontWeight: FontWeight.bold),
+                            //     ),
+                            //     const Spacer(),
+                            //     Text(
+                            //       "${formatCurrency.format(product.price)}",
+                            //       style: const TextStyle(
+                            //           fontSize: 14,
+                            //           fontWeight: FontWeight.bold,
+                            //           color: Colors.blue),
+                            //     ),
+                            //   ],
+                            // ),
+
                             Row(
                               children: [
-                                Text(
-                                  "Total Stock: ${product.totalStock}",
-                                  style: const TextStyle(
+                                Expanded(
+                                  child: Text(
+                                    "Total Stock: ${product.totalStock}",
+                                    style: const TextStyle(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                  ),
                                 ),
-                                const Spacer(),
+                                const SizedBox(
+                                    width: 8), // jarak antara teks dan harga
                                 Text(
                                   "${formatCurrency.format(product.price)}",
                                   style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               ],
                             ),
+
                             const SizedBox(height: 5),
+                            // Row(
+                            //   children: [
+                            //     Text(
+                            //       "Exp Date: ${product.fifoExp}",
+                            //       style: TextStyle(
+                            //         fontSize: 14,
+                            //         fontWeight: FontWeight.bold,
+                            //         color: expiringSoon
+                            //             ? Colors.red
+                            //             : Colors.black,
+                            //       ),
+                            //     ),
+                            //     const Spacer(),
+                            //     // IconButton(
+                            //     //   icon: isFavorite
+                            //     //       ? const Icon(
+                            //     //           Icons.favorite,
+                            //     //           color: Colors.red,
+                            //     //         )
+                            //     //       : const Icon(
+                            //     //           Icons.favorite_border,
+                            //     //           color: Colors.grey,
+                            //     //         ),
+                            //     //   onPressed: toggleFavorite,
+                            //     // ),
+
+                            //     // IconButton(
+                            //     //   icon: favorites[product.id] == true
+                            //     //       ? const Icon(Icons.favorite,
+                            //     //           color: Colors.red)
+                            //     //       : const Icon(Icons.favorite_border,
+                            //     //           color: Colors.grey),
+                            //     //   onPressed: () {
+                            //     //     toggleFavorite(product.id);
+                            //     //   },
+                            //     // ),
+
+                            //     IconButton(
+                            //       icon: (_favoriteStatus[product.id] ?? false)
+                            //           ? const Icon(Icons.favorite,
+                            //               color: Colors.red)
+                            //           : const Icon(Icons.favorite_border,
+                            //               color: Colors.grey),
+                            //       onPressed: () {
+                            //         toggleFavorite(product.id);
+                            //       },
+                            //     ),
+                            //   ],
+                            // )
+
                             Row(
                               children: [
-                                Text(
-                                  "Exp Date: ${product.fifoExp}",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: expiringSoon
-                                        ? Colors.red
-                                        : Colors.black,
+                                Expanded(
+                                  child: Text(
+                                    "Exp Date: ${product.fifoExp}",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: expiringSoon
+                                          ? Colors.red
+                                          : Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
                                   ),
                                 ),
-                                const Spacer(),
-                                // IconButton(
-                                //   icon: isFavorite
-                                //       ? const Icon(
-                                //           Icons.favorite,
-                                //           color: Colors.red,
-                                //         )
-                                //       : const Icon(
-                                //           Icons.favorite_border,
-                                //           color: Colors.grey,
-                                //         ),
-                                //   onPressed: toggleFavorite,
-                                // ),
-
-                                // IconButton(
-                                //   icon: favorites[product.id] == true
-                                //       ? const Icon(Icons.favorite,
-                                //           color: Colors.red)
-                                //       : const Icon(Icons.favorite_border,
-                                //           color: Colors.grey),
-                                //   onPressed: () {
-                                //     toggleFavorite(product.id);
-                                //   },
-                                // ),
-
+                                const SizedBox(
+                                    width:
+                                        4), // memberi jarak antara teks dan icon
                                 IconButton(
                                   icon: (_favoriteStatus[product.id] ?? false)
                                       ? const Icon(Icons.favorite,
@@ -635,9 +727,12 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                                   onPressed: () {
                                     toggleFavorite(product.id);
                                   },
+                                  constraints:
+                                      const BoxConstraints(), // mencegah extra padding
+                                  padding: EdgeInsets.zero, // padding minimal
                                 ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),

@@ -274,7 +274,7 @@ class QuantitySelector extends StatefulWidget {
 }
 
 class _QuantitySelectorState extends State<QuantitySelector> {
-  int quantity = 1;
+  int quantity = 0; 
   late TextEditingController _controller;
   bool isEmpty = false; // Menandai apakah input kosong
 

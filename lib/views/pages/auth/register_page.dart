@@ -239,7 +239,9 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ta_c14210052/constant/api_url.dart';
+import 'package:ta_c14210052/main.dart';
 import 'package:ta_c14210052/views/pages/auth/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -265,8 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String successMessage = '';
 
   // Ganti URL sesuai dengan Laravel kamu
-  final String apiUrl =
-      '$responseUrl/api/auth/register'; // untuk emulator Android
+  // final String apiUrl = '$responseUrl/api/auth/register'; // untuk emulator Android
 
   // Future<void> registerUser() async {
   //   setState(() {
@@ -334,93 +335,167 @@ class _RegisterPageState extends State<RegisterPage> {
   //   }
   // }
 
-  Future<void> registerUser() async {
-    setState(() {
-      errorMessage = '';
-      successMessage = '';
-    });
+  // Future<void> registerUser() async {
+  //   setState(() {
+  //     errorMessage = '';
+  //     successMessage = '';
+  //   });
 
-    if (_passwordController.text != _confirmPasswordController.text) {
-      setState(() {
-        errorMessage = 'Password dan Konfirmasi tidak sama!';
-      });
+  //   if (_passwordController.text != _confirmPasswordController.text) {
+  //     setState(() {
+  //       errorMessage = 'Password dan Konfirmasi tidak sama!';
+  //     });
+  //     return;
+  //   }
+
+  //   // Tampilkan loading spinner
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return const Center(child: CircularProgressIndicator());
+  //     },
+  //   );
+
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('$responseUrl/api/auth/register'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({
+  //         'name': _nameController.text,
+  //         'email': _emailController.text,
+  //         'phone': _phoneController.text,
+  //         'password': _passwordController.text,
+  //         'password_confirmation': _confirmPasswordController.text,
+  //         'usertype': 'employee',
+  //       }),
+  //     );
+
+  //     final json = jsonDecode(response.body);
+
+  //     // Tutup loading spinner
+  //     // Navigator.of(context).pop();
+
+  //     // if (response.statusCode == 200 && json['success'] == true) {
+  //     //   ScaffoldMessenger.of(context).showSnackBar(
+  //     //     SnackBar(
+  //     //         content: Text(json['message']), backgroundColor: Colors.green),
+  //     //   );
+
+  //     //   await Future.delayed(
+  //     //       const Duration(seconds: 2)); // Tunggu 2 detik biar user baca
+
+  //     //   Navigator.pushReplacement(
+  //     //       context, MaterialPageRoute(builder: (_) => const LoginPage()));
+  //     // }
+
+  //     Navigator.of(context).pop(); // Tutup dialog loading
+
+  //     // if (response.statusCode == 200 && json['success'] == true) {
+  //     if ((response.statusCode == 200 || response.statusCode == 201) && json['success'] == true) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //             content: Text(json['message']), backgroundColor: Colors.green),
+  //       );
+
+  //       // await Future.delayed(const Duration(seconds: 2));
+
+  //       // Tunggu 1 frame dulu, supaya pop selesai
+  //       // Future.microtask(() {
+  //       //   Navigator.push(
+  //       //     context,
+  //       //     MaterialPageRoute(builder: (context) => const LoginPage()),
+  //       //   );
+  //       // });
+
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const LoginPage()),
+  //       );
+  //     } else {
+  //       setState(() {
+  //         errorMessage = json['message'] ?? 'Gagal mendaftar.';
+  //       });
+  //     }
+  //   } catch (e) {
+  //     Navigator.of(context).pop(); // Pastikan close loading kalau error
+  //     setState(() {
+  //       errorMessage = 'Terjadi kesalahan: $e';
+  //     });
+  //   }
+  // }
+
+  // fungsi untuk melakukan register 
+  Future<void> registerUser() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Password dan konfirmasi tidak cocok")),
+      );
       return;
     }
 
-    // Tampilkan loading spinner
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
-
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$responseUrl/api/auth/signup'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: jsonEncode({
-          'name': _nameController.text,
-          'email': _emailController.text,
-          'phone': _phoneController.text,
-          'password': _passwordController.text,
-          'password_confirmation': _confirmPasswordController.text,
-          'usertype': 'cashier',
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'password_confirmation': confirmPassword, // Laravel butuh field ini
         }),
       );
 
-      final json = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final user = data['user'];
 
-      // Tutup loading spinner
-      // Navigator.of(context).pop();
+        // Simpan token dan user info
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('namaUser', user['name']);
+        // await prefs.setInt('user_id', user['id']);
+        if (user['id'] != null) {
+          await prefs.setInt('user_id', user['id']);
+        }
+        await prefs.setString('profileImage', user['profile_image'] ?? '');
 
-      // if (response.statusCode == 200 && json['success'] == true) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //         content: Text(json['message']), backgroundColor: Colors.green),
-      //   );
-
-      //   await Future.delayed(
-      //       const Duration(seconds: 2)); // Tunggu 2 detik biar user baca
-
-      //   Navigator.pushReplacement(
-      //       context, MaterialPageRoute(builder: (_) => const LoginPage()));
-      // }
-
-      Navigator.of(context).pop(); // Tutup dialog loading
-
-      // if (response.statusCode == 200 && json['success'] == true) {
-      if ((response.statusCode == 200 || response.statusCode == 201) && json['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(json['message']), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text("Pendaftaran berhasil!"),
+            backgroundColor: Colors.green,
+          ),
         );
 
-        // await Future.delayed(const Duration(seconds: 2));
-
-        // Tunggu 1 frame dulu, supaya pop selesai
-        // Future.microtask(() {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => const LoginPage()),
-        //   );
-        // });
-
+        // Navigasi ke halaman utama setelah register
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {
-        setState(() {
-          errorMessage = json['message'] ?? 'Gagal mendaftar.';
-        });
+        final errorData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorData['message'] ?? "Pendaftaran gagal"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      Navigator.of(context).pop(); // Pastikan close loading kalau error
-      setState(() {
-        errorMessage = 'Terjadi kesalahan: $e';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Terjadi kesalahan: $e")),
+      );
     }
   }
 
@@ -529,6 +604,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
+                // tombol untuk memanggil fungsi membuat/register user
                 child: ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),

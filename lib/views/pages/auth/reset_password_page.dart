@@ -416,6 +416,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     _startResendTimer();
   }
 
+  // mengatur timer untuk mengirimkan ulang kode otp
   void _startResendTimer() {
     setState(() {
       _canResend = false;
@@ -445,6 +446,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
+  // fungsi untuk mengecek kode yang di inputkan 
   Future<void> _verifyCode() async {
     final code = _controllers.map((e) => e.text).join();
     if (code.length == 4) {
