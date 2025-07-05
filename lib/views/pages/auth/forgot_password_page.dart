@@ -55,7 +55,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   //       style: TextStyle(color: Colors.white)),
                   // ),
 
-                // untuk meminta kode verifikasi
+                  // untuk meminta kode verifikasi
                   ElevatedButton(
                 onPressed: () async {
                   final email = _emailController.text.trim();

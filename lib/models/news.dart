@@ -2,16 +2,16 @@ class NewsArticle {
   final String title;
   final String imageUrl;
   final String url;
-  final String description; // Add description field
-  final String publishedAt;  // Add publishedAt field
+  final String description; 
+  final String publishedAt;  
 
   // Constructor with required fields and optional fields for null handling
   NewsArticle({
     required this.title,
     required this.imageUrl,
     required this.url,
-    required this.description, // Required description
-    required this.publishedAt,  // Required publishedAt
+    required this.description, 
+    required this.publishedAt, 
   });
 
   // Factory constructor to create an instance of NewsArticle from JSON

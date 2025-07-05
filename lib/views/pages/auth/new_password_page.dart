@@ -12,8 +12,8 @@ class NewPasswordPage extends StatefulWidget {
 }
 
 class _NewPasswordPageState extends State<NewPasswordPage> {
-  bool _isObscureNewPassword = true; 
-  bool _isObscureConfirmPassword = true; 
+  bool _isObscureNewPassword = true;
+  bool _isObscureConfirmPassword = true;
 
   final TextEditingController _newPassController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
@@ -95,7 +95,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                     //       style: TextStyle(color: Colors.white)),
                     // ),
 
-                  // tombol untuk mengirimkan password baru ke backend
+                    // tombol untuk mengirimkan password baru ke backend
                     ElevatedButton(
                   onPressed: () async {
                     final newPass = _newPassController.text;

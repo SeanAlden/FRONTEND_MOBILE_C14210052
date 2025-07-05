@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ta_c14210052/constant/api_url.dart';
 import 'package:ta_c14210052/models/product.dart';
-import 'package:ta_c14210052/views/pages/app/quantity_selector.dart';
+import 'package:ta_c14210052/widgets/quantity_selector.dart';
 import 'package:readmore/readmore.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -65,14 +65,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
       return;
     }
-
-    // final prefs = await SharedPreferences.getInstance();
-    // final token = prefs.getString('token');
+    
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     final userId = prefs.getInt('user_id');
 
-    if (!mounted) return; // Tambahkan ini juga
+    if (!mounted) return; 
     // if (token == null || token.isEmpty || userId == null) {
     //   ScaffoldMessenger.of(context).showSnackBar(
     //     const SnackBar(
