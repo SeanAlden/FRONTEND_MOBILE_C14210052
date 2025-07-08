@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsDetailPage extends StatelessWidget {
@@ -8,7 +9,8 @@ class NewsDetailPage extends StatelessWidget {
   final String publishedAt;
   final String url;
 
-  const NewsDetailPage({super.key, 
+  const NewsDetailPage({
+    super.key,
     required this.title,
     required this.imageUrl,
     required this.description,
@@ -21,6 +23,15 @@ class NewsDetailPage extends StatelessWidget {
       await launch(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  String _formatDate(String dateStr) {
+    try {
+      final DateTime parsedDate = DateTime.parse(dateStr);
+      return DateFormat('dd MMMM yyyy').format(parsedDate);
+    } catch (e) {
+      return dateStr; // fallback jika gagal parsing
     }
   }
 
@@ -58,8 +69,13 @@ class NewsDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8.0),
+            // Text(
+            //   '${'Published On : '} $publishedAt',
+            //   style: TextStyle(color: Colors.grey[600]),
+            // ),
+
             Text(
-              '${'Published On : '} $publishedAt', 
+              'Published On: ${_formatDate(publishedAt)}',
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 16.0),
@@ -72,7 +88,8 @@ class NewsDetailPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: _launchURL,
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -81,7 +98,7 @@ class NewsDetailPage extends StatelessWidget {
                   elevation: 5,
                 ),
                 child: const Text(
-                  'Read Full Article', 
+                  'Read Full Article',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
