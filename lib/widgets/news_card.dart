@@ -25,7 +25,7 @@ class _NewsWidgetState extends State<NewsWidget> {
 
   Future<List<NewsArticle>> fetchNews() async {
     final response = await http.get(Uri.parse(
-        'https://newsapi.org/v2/everything?q=medicines&apiKey=16f57f8d0e444696863da47a233e651b'));
+        'https://newsapi.org/v2/everything?q=drugs&apiKey=16f57f8d0e444696863da47a233e651b'));
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body)['articles'];

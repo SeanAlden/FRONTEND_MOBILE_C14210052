@@ -6,6 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ta_c14210052/constant/api_url.dart';
+import 'package:ta_c14210052/views/pages/app/best_seller_prediction.dart';
 import 'package:ta_c14210052/views/pages/app/favorite_page.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
@@ -345,6 +346,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         destination: const ChangePasswordPage()),
                     buildMenuItem(Icons.favorite, "Favorite", context,
                         destination: const FavoritePage()),
+                    buildMenuItem(
+                        Icons.book, "Best Selling Product", context,
+                        destination: const BestSellerPrediction()),
                     buildMenuItem(Icons.logout, "Log Out", context,
                         isLogout: true),
                   ],

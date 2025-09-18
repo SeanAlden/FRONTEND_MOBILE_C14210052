@@ -1,9 +1,8 @@
 plugins {
     id "com.android.application"
-    // id "kotlin-android"
+    id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
-    id 'kotlin-android' // ✅ Tambahkan baris ini
 }
 
 def localProperties = new Properties()
@@ -26,6 +25,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.ta_c14210052"
+    compileSdkVersion 34
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

@@ -11,6 +11,7 @@ import 'package:ta_c14210052/views/pages/app/product_detail_screen.dart';
 import 'package:ta_c14210052/views/pages/app/product_screen.dart';
 import 'package:ta_c14210052/views/pages/app/product_search_page.dart';
 import 'package:ta_c14210052/widgets/category_card.dart';
+import 'package:ta_c14210052/widgets/news_card.dart';
 import 'package:ta_c14210052/widgets/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -477,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 10),
                       SizedBox(
-                        height: 390,
+                        height: 340,
                         child: products.isEmpty
                             ? const Center(child: CircularProgressIndicator())
                             : ListView.builder(
@@ -506,11 +507,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
 
                       // Section: News
-                      // const Text("News",
-                      //     style: TextStyle(
-                      //         fontSize: 18, fontWeight: FontWeight.bold)),
-                      // const SizedBox(height: 2),
-                      // const NewsWidget(),
+                      const Text("News",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 2),
+                      const NewsWidget(),
                     ]),
               ),
             )));
