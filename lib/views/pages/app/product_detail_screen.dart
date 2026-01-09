@@ -206,7 +206,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             borderRadius: BorderRadius.circular(12),
             child: (widget.product.imageUrl.isNotEmpty)
                 ? Image.network(
-                    "$responseUrl/public/storage/${widget.product.imageUrl}",
+                    // "$responseUrl/public/storage/${widget.product.imageUrl}",
+                    // "$responseUrl/storage/${widget.product.imageUrl}",
+                    "${widget.product.imageUrl}",
                     width: 200,
                     height: 230,
                     fit: BoxFit.fill,

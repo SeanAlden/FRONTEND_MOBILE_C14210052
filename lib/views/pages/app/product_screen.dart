@@ -384,7 +384,9 @@ class _ProductScreenState extends State<ProductScreen> {
                             borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(10)),
                             child: Image.network(
-                              "$responseUrl/public/storage/${product.imageUrl}",
+                              // "$responseUrl/public/storage/${product.imageUrl}",
+                              // "$responseUrl/storage/${product.imageUrl}",
+                              "${product.imageUrl}",
                               height: 110,
                               width: double.infinity,
                               fit: BoxFit.fill,

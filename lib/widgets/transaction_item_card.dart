@@ -134,7 +134,9 @@ class TransactionItemCard extends StatelessWidget {
                     ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
-                          "$responseUrl/public/storage/${firstProduct.product!.imageUrl}",
+                          // "$responseUrl/public/storage/${firstProduct.product!.imageUrl}",
+                          // "$responseUrl/storage/${firstProduct.product!.imageUrl}",
+                          "${firstProduct.product!.imageUrl}",
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,

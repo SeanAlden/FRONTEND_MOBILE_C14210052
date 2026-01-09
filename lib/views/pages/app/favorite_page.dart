@@ -369,7 +369,8 @@ class _FavoritePageState extends State<FavoritePage> {
                               width: double.infinity,
                               child: product.imageUrl.isNotEmpty
                                   ? Image.network(
-                                      "$responseUrl/public/storage/${product.imageUrl}",
+                                      // "$responseUrl/public/storage/${product.imageUrl}",
+                                      "$responseUrl/storage/${product.imageUrl}",
                                       fit: BoxFit.fill,
                                       errorBuilder:
                                           (context, error, stackTrace) {

@@ -657,7 +657,9 @@ class _CartPageState extends State<CartPage> {
 
                                   item.productImage.isNotEmpty
                                       ? Image.network(
-                                          "$responseUrl/public/storage/${item.productImage}",
+                                          // "$responseUrl/public/storage/${item.productImage}",
+                                          // "$responseUrl/storage/${item.productImage}",
+                                          "${item.productImage}",
                                           width: 60,
                                           height: 60,
                                           fit: BoxFit.cover,

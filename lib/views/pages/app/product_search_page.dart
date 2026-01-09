@@ -221,7 +221,9 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                         borderRadius: BorderRadius.circular(8),
                         child: product.imageUrl.isNotEmpty
                             ? Image.network(
-                                "$responseUrl/public/storage/${product.imageUrl}",
+                                // "$responseUrl/public/storage/${product.imageUrl}",
+                                // "$responseUrl/storage/${product.imageUrl}",
+                                "${product.imageUrl}",
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.fill,

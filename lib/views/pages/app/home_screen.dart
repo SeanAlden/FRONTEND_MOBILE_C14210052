@@ -248,10 +248,30 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 ClipOval(
-                                  child: (_profileImage != null &&
+                                  child: 
+                                  (_profileImage != null &&
                                           _profileImage!.isNotEmpty)
-                                      ? Image.network(
-                                          '$responseUrl/public/storage/profile_images/$_profileImage',
+                                      ? 
+                                      // Image.network(
+                                      //     // '$responseUrl/public/storage/profile_images/$_profileImage',
+                                      //     '$responseUrl/storage/profile_images/$_profileImage',
+                                      //     // '$_profileImage',
+                                      //     width: 50,
+                                      //     height: 50,
+                                      //     fit: BoxFit.cover,
+                                      //     errorBuilder:
+                                      //         (context, error, stackTrace) {
+                                      //       return Image.asset(
+                                      //         'assets/images/profile.png',
+                                      //         width: 50,
+                                      //         height: 50,
+                                      //         fit: BoxFit.cover,
+                                      //       );
+                                      //     },
+                                      //   )
+
+                                      Image.network(
+                                          '$_profileImage',
                                           width: 50,
                                           height: 50,
                                           fit: BoxFit.cover,
@@ -507,11 +527,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
 
                       // Section: News
-                      const Text("News",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 2),
-                      const NewsWidget(),
+                      // const Text("News",
+                      //     style: TextStyle(
+                      //         fontSize: 18, fontWeight: FontWeight.bold)),
+                      // const SizedBox(height: 2),
+                      // const NewsWidget(),
                     ]),
               ),
             )));

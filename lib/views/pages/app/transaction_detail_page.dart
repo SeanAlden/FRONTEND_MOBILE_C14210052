@@ -307,9 +307,12 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                         //     : Image.asset('assets/images/product.png',
                         //         width: 50, height: 50, fit: BoxFit.cover),
 
-                        (detail.photo!.isNotEmpty)
+                        // (detail.photo!.isNotEmpty)
+                        (detail.photo != null && detail.photo!.isNotEmpty)  
                             ? Image.network(
-                                '$responseUrl/public/storage/${detail.photo}',
+                                // '$responseUrl/public/storage/${detail.photo}',
+                                // '$responseUrl/storage/${detail.photo}',
+                                '${detail.photo}',
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,

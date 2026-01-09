@@ -16,7 +16,8 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool isFavorite = false; // variabel untuk menyimpan data produk yang dipilih menjadi produk favorit atau bukan 
+  bool isFavorite =
+      false; // variabel untuk menyimpan data produk yang dipilih menjadi produk favorit atau bukan
   final formatCurrency =
       NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 2);
 
@@ -27,7 +28,7 @@ class _ProductCardState extends State<ProductCard> {
     checkIfFavorite();
   }
 
-  // fungsi untuk mengecek status favorit pada tiap produk, apakah dipilih menjadi produk favorit atau tidak    
+  // fungsi untuk mengecek status favorit pada tiap produk, apakah dipilih menjadi produk favorit atau tidak
   Future<void> checkIfFavorite() async {
     final token = await getToken();
     if (token != null) {
@@ -48,7 +49,7 @@ class _ProductCardState extends State<ProductCard> {
     }
   }
 
-  // fungsi untuk memilih / membatalkan produk dari status produk favorit 
+  // fungsi untuk memilih / membatalkan produk dari status produk favorit
   Future<void> toggleFavorite() async {
     final token = await getToken();
     if (token != null) {
@@ -89,7 +90,7 @@ class _ProductCardState extends State<ProductCard> {
         today.isBefore(nearestExpDate) &&
         today.add(const Duration(days: 90)).isAfter(nearestExpDate);
 
-    // container untuk widget card 
+    // container untuk widget card
     return Container(
       width: 250,
       margin: const EdgeInsets.only(right: 16),
@@ -101,7 +102,7 @@ class _ProductCardState extends State<ProductCard> {
       //   ],
       // ),
 
-      // pengaturan warna pada box berdasarkan kondisi produk 
+      // pengaturan warna pada box berdasarkan kondisi produk
       decoration: BoxDecoration(
         color: widget.product.totalStock == 0
             ? Colors.red[100]
@@ -129,29 +130,64 @@ class _ProductCardState extends State<ProductCard> {
 
             // mengatur gambar yang ditampilkan pada aplikasi
             child: widget.product.imageUrl.isNotEmpty
-                // menampilkan gambar dari storage pada backend dengan api call
-                ? Image.network(
-                    "$responseUrl/public/storage/${widget.product.imageUrl}",
-                    width: 250,
-                    height: 140,
-                    fit: BoxFit.fill,
-                    // jika gagal di load, akan memunculkan gambar default
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/product.png',
-                        width: 250,
-                        height: 140,
-                        fit: BoxFit.fill,
-                      );
-                    },
-                  )
-                  // jika tidak ada gambar (kosong), akan memunculkan gambar default
-                : Image.asset(
+            // menampilkan gambar dari storage pada backend dengan api call
+            ?
+            // Image.network(
+            //     "$responseUrl/public/storage/${widget.product.imageUrl}",
+            //     width: 250,
+            //     height: 140,
+            //     fit: BoxFit.fill,
+            //     // jika gagal di load, akan memunculkan gambar default
+            //     errorBuilder: (context, error, stackTrace) {
+            //       return Image.asset(
+            //         'assets/images/product.png',
+            //         width: 250,
+            //         height: 140,
+            //         fit: BoxFit.fill,
+            //       );
+            //     },
+            //   )
+
+            // Image.network(
+            //     "$responseUrl/storage/${widget.product.imageUrl}",
+            //     // "${widget.product.imageUrl}",
+            //     width: 250,
+            //     height: 140,
+            //     fit: BoxFit.fill,
+            //     // jika gagal di load, akan memunculkan gambar default
+            //     errorBuilder: (context, error, stackTrace) {
+            //       return Image.asset(
+            //         'assets/images/product.png',
+            //         width: 250,
+            //         height: 140,
+            //         fit: BoxFit.fill,
+            //       );
+            //     },
+            //   )
+
+              Image.network(
+                "${widget.product.imageUrl}",
+                // "${widget.product.imageUrl}",
+                width: 250,
+                height: 140,
+                fit: BoxFit.fill,
+                // jika gagal di load, akan memunculkan gambar default
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
                     'assets/images/product.png',
                     width: 250,
                     height: 140,
                     fit: BoxFit.fill,
-                  ),
+                  );
+                },
+              )
+              // jika tidak ada gambar (kosong), akan memunculkan gambar default
+            : Image.asset(
+                'assets/images/product.png',
+                width: 250,
+                height: 140,
+                fit: BoxFit.fill,
+              ),
           ),
           Expanded(
             child: Padding(
@@ -224,14 +260,14 @@ class _ProductCardState extends State<ProductCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                  // total stok dari produk terkait
+                        // total stok dari produk terkait
                         child: Text(
                           "Stock: ${widget.product.totalStock}",
                           style: const TextStyle(fontSize: 12),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8), 
+                      const SizedBox(width: 8),
                       // harga produk
                       Text(
                         "${formatCurrency.format(widget.product.price)}",

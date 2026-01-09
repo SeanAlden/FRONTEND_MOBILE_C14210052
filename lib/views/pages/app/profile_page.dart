@@ -272,7 +272,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       _profileImage!.isNotEmpty)
                                   ? ClipOval(
                                       child: Image.network(
-                                        '$responseUrl/public/storage/profile_images/$_profileImage',
+                                        // '$responseUrl/public/storage/profile_images/$_profileImage',
+                                        // '$responseUrl/storage/profile_images/$_profileImage',
+                                        '$_profileImage',
                                         width: 100,
                                         height: 100,
                                         fit: BoxFit.cover,
@@ -346,9 +348,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         destination: const ChangePasswordPage()),
                     buildMenuItem(Icons.favorite, "Favorite", context,
                         destination: const FavoritePage()),
-                    buildMenuItem(
-                        Icons.book, "Best Selling Product", context,
-                        destination: const BestSellerPrediction()),
+                    // buildMenuItem(
+                    //     Icons.book, "Best Selling Product", context,
+                    //     destination: const BestSellerPrediction()),
                     buildMenuItem(Icons.logout, "Log Out", context,
                         isLogout: true),
                   ],

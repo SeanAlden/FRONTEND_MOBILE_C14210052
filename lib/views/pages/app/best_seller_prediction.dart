@@ -292,7 +292,7 @@ class _BestSellerPredictionState extends State<BestSellerPrediction> {
             };
           }).toList();
 
-          // Pengurutan secara descending 
+          // Pengurutan secara descending
           products.sort((a, b) =>
               (b['accuracy'].toDouble()).compareTo(a['accuracy'].toDouble()));
 
@@ -303,9 +303,11 @@ class _BestSellerPredictionState extends State<BestSellerPrediction> {
       }
     } catch (e) {
       print("Error: $e");
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -379,7 +381,8 @@ class _BestSellerPredictionState extends State<BestSellerPrediction> {
                               child: (product['photo'] != null &&
                                       product['photo'].toString().isNotEmpty)
                                   ? Image.network(
-                                      "$responseUrl/public/storage/${product['photo']}",
+                                      // "$responseUrl/public/storage/${product['photo']}",
+                                      "$responseUrl/storage/${product['photo']}",
                                       width: 100,
                                       height: 100,
                                       fit: BoxFit.cover,
