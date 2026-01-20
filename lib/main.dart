@@ -78,9 +78,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // variabel yang menyimpan indeks terpilih pada bottom navbar
-  int _selectedIndex = 0;
-
   // halaman-halaman pada bottom navbar
   final List<Widget> _pages = [
     const HomeScreen(), // halaman home
@@ -88,6 +85,9 @@ class _MainScreenState extends State<MainScreen> {
     const NotificationPage(), // halaman notifikasi
     const ProfilePage(), // halaman profil
   ];
+
+  // variabel yang menyimpan indeks terpilih pada bottom navbar
+  int _selectedIndex = 0;
 
   // mengambil data profil dari user saat init state
   @override
